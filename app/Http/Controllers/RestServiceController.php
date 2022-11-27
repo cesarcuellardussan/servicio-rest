@@ -190,4 +190,43 @@ class RestServiceController extends Controller
             ];
         }
     }
+
+    /**
+     * Metodo para consultar el saldo
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function CheckBalance(Request $request){
+        $rules= [
+            'documento' => 'required',
+            'celular'   => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        try{
+            //Errores de validacion
+            if ($validator->fails()){
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => $validator->errors()->first(),
+                ];
+            }else{
+                $results = $this->soapWrapper->call('SoapService.CheckBalance', [[
+                    'documento' => $request->documento,
+                    'celular'   => $request->celular
+                ]]);
+                return $results;
+            }
+        } catch (\Throwable $th) {
+            //Errores de fallo de servidor
+            return [
+                'success'       => 'false',
+                'cod_error'     => '500',
+                'message_error' => $th->getMessage()
+            ];
+        }
+    }
 }
