@@ -19,3 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('RegisterClient', 'RestServiceController@RegisterClient');
+Route::post('RechargeWallet', 'RestServiceController@RechargeWallet');
+Route::post('PayPurchase'   , 'RestServiceController@PayPurchase');

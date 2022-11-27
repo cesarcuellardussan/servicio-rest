@@ -29,6 +29,12 @@ class RestServiceController extends Controller
         });
     }
 
+    /**
+     * Metodo para registrar un cliente
+     *
+     * @param Request $request
+     * @return array
+     */
     public function RegisterClient(Request $request){
         $rules= [
             'documento' => 'required',
@@ -67,78 +73,82 @@ class RestServiceController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Metodo para recargar la billetera
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return array
      */
-    public function index()
-    {
-        //
+    public function RechargeWallet(Request $request){
+        $rules= [
+            'documento' => 'required',
+            'celular'   => 'required',
+            'valor'     => 'required|numeric|gt:0',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        try{
+            //Errores de validacion
+            if ($validator->fails()){
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => $validator->errors()->first(),
+                ];
+            }else{
+                $results = $this->soapWrapper->call('SoapService.RechargeWallet', [[
+                    'documento' => $request->documento,
+                    'celular'   => $request->celular,
+                    'valor'     => $request->valor
+                ]]);
+                return $results;
+            }
+        } catch (\Throwable $th) {
+            //Errores de fallo de servidor
+            return [
+                'success'       => 'false',
+                'cod_error'     => '500',
+                'message_error' => $th->getMessage()
+            ];
+        }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Metodo para pagar compras
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return array
      */
-    public function create()
-    {
-        //
-    }
+    public function PayPurchase(Request $request){
+        $rules= [
+            'documento' => 'required',
+            'valor'     => 'required|numeric|gt:0',
+        ];
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $validator = Validator::make($request->all(), $rules);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        try{
+            //Errores de validacion
+            if ($validator->fails()){
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => $validator->errors()->first(),
+                ];
+            }else{
+                $results = $this->soapWrapper->call('SoapService.PayPurchase', [[
+                    'documento' => $request->documento,
+                    'valor'     => $request->valor
+                ]]);
+                return $results;
+            }
+        } catch (\Throwable $th) {
+            //Errores de fallo de servidor
+            return [
+                'success'       => 'false',
+                'cod_error'     => '500',
+                'message_error' => $th->getMessage()
+            ];
+        }
     }
 }
