@@ -151,4 +151,43 @@ class RestServiceController extends Controller
             ];
         }
     }
+
+    /**
+     * Metodo para confirmar pago
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function ConfirmPayment(Request $request){
+        $rules= [
+            'id'    => 'required|numeric|gt:0',
+            'token' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        try{
+            //Errores de validacion
+            if ($validator->fails()){
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => $validator->errors()->first(),
+                ];
+            }else{
+                $results = $this->soapWrapper->call('SoapService.ConfirmPayment', [[
+                    'id'    => $request->id,
+                    'token' => $request->token
+                ]]);
+                return $results;
+            }
+        } catch (\Throwable $th) {
+            //Errores de fallo de servidor
+            return [
+                'success'       => 'false',
+                'cod_error'     => '500',
+                'message_error' => $th->getMessage()
+            ];
+        }
+    }
 }

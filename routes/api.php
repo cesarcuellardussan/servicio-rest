@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('RegisterClient', 'RestServiceController@RegisterClient');
-Route::post('RechargeWallet', 'RestServiceController@RechargeWallet');
-Route::post('PayPurchase'   , 'RestServiceController@PayPurchase');
+Route::post('RegisterClient'   , 'RestServiceController@RegisterClient');
+Route::post('RechargeWallet'   , 'RestServiceController@RechargeWallet');
+Route::post('PayPurchase'      , 'RestServiceController@PayPurchase');
+Route::post('ConfirmPayment'   , 'RestServiceController@ConfirmPayment');
